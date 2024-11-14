@@ -1,0 +1,16 @@
+<launch>
+  <node pkg="rviz" type="rviz" name="" args="-d $(find vcam3d)/default.rviz" />
+  <node ns="vcam" pkg="rostopic" name="camera_info" type="rostopic"
+      args="pub camera_info sensor_msgs/CameraInfo
+     '{header: {seq: 0, stamp: {secs: 0, nsecs: 0}, frame_id: 'camera'},
+      height: 480, width: 640, distortion_model: 'plumb_bob',
+      D: [0],
+      K: [2070.3208281890875, 0.0, 451.6704559326172, 0.0, 2070.3208281890875, 477.6067123413086,
+      0.0, 0.0, 1.0],
+      R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+      P: [1035.8376579761182, 0.0, 226.62960815429688, 0.0, 0.0, 1035.8376579761182,
+      224.84519386291504, 0.0, 0.0, 0.0, 1.0, 0.0],
+      binning_x: 0, binning_y: 0,
+      roi: {x_offset: 0, y_offset: 0, height: 480, width: 640, do_rectify: false}}' -r 2" />
+
+</launch>

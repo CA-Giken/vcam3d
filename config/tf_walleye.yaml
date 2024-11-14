@@ -1,0 +1,64 @@
+config_tf:
+  base:
+    parent_frame_id: world
+    transform:
+      rotation:
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      translation:
+        x: 0
+        y: 0
+        z: 0
+  camera:
+    parent_frame_id: base
+    transform:
+      rotation:
+        w: 0.00322703445269
+        x: 0.704780529792
+        y: 0.709416731561
+        z: 0.00137552009922
+      translation:
+        x: 0 #1233.98803719
+        y: 0 #-923.237113707
+        z: 1357.02396049
+
+  tool0_controller:
+    parent_frame_id: base
+    transform:
+      rotation:
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      translation:
+        x: 0
+        y: 0
+        z: 0
+  flange:
+    parent_frame_id: tool0_controller
+    transform:
+      rotation:
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      translation:
+        x: 0
+        y: 0
+        z: 0
+
+  tool1:
+    parent_frame_id: flange
+    transform:
+      rotation:
+        x: 1
+        y: 0
+        z: 0
+        w: 0
+      translation:
+        x: 0
+        y: 0
+        z: 500
+
