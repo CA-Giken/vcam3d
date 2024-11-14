@@ -1,6 +1,6 @@
 # Virtual 3D Camera
 
-[Screen Shot](screeshot.png)
+![Screen Shot](screenshot.png)
 
 ## 必要ROSパッケージ
 ### バーチャル2Dカメラ
