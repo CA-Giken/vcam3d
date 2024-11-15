@@ -7,10 +7,13 @@ from scipy.spatial.transform import Rotation as rot
 
 def samp(name,res):
   mesh = o3d.io.read_triangle_mesh(name+".stl")
-  pcd=mesh.sample_points_uniformly(number_of_points=1000000)
+  bbox=mesh.get_oriented_bounding_box()
+  sz=np.array(bbox.extent)
+  points=2*int(sz[0]/res*sz[1]/res)+2*int(sz[1]/res*sz[2]/res)+2*int(sz[2]/res*sz[0]/res)
+  print(name+".stl","samples",points)
+  pcd=mesh.sample_points_uniformly(number_of_points=points)
   pcdd=pcd.voxel_down_sample(voxel_size=res)
+  print(name+".ply","voxels",len(pcdd.points))
   o3d.io.write_point_cloud(name+".ply",pcdd)
 
-samp('marud',2)
-samp('tatep',2)
-samp('circle',2)
+samp('circle',0.5)

@@ -55,11 +55,6 @@ def showModel(name,frame='world',color=(0.8,0.8,0.8),x=0,y=0,z=0,theta=0):
   uT[2,3]=z
   uT[:3,:3]=R.from_euler('Z',theta,degrees=True).as_matrix()
   markers.publishMesh(wTu.dot(uT),mesh,color,scale, 1)
-  if not Points_lock:
-    thispath=subprocess.getoutput("rospack find vcam3d")
-    pcd=o3d.io.read_point_cloud(thispath+'/mesh/'+name+'.ply')
-#    pcd=pcd.transform(wTu.dot(uT))
-#    Points=np.vstack((Points,np.array(pcd.points)))
 
 # Initialize the ROS Node
 rospy.init_node('vscene', anonymous=False, log_level=rospy.INFO, disable_signals=False)
@@ -74,8 +69,6 @@ rospy.Subscriber("/request/redraw",Bool,cb_redraw)
 rospy.on_shutdown(cleanup_node)
 
 markers=rviz_tools.RvizMarkers('world', 'vscene_marker')
-#allPointCloud=PoitCloud2()
-Points_lock=False
 
 ###TF
 tfBuffer=tf2_ros.Buffer()
@@ -87,5 +80,4 @@ rospy.sleep(2)
 while not rospy.is_shutdown():
   for m in Config["meshes"]:
     showModel(m[0],frame=m[1],color=m[2])
-  Points_lock=True
   rospy.Rate(3).sleep()
