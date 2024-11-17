@@ -111,7 +111,7 @@ def loadMesh(mesh,frame='world'):
   name=name+'.ply'
   pcd=o3d.io.read_point_cloud(name)
   print("vcam load ply",name,len(pcd.points))
-  voxel=np.sqrt(Config["wx"]*Config["wy"]/100000)
+  voxel=np.sqrt(Config["wx"]*Config["wy"]/50000)
   print("vcam voxel",voxel)
   dwnpcd=pcd.voxel_down_sample(voxel)
   if len(pcd.points)>0:
@@ -124,11 +124,11 @@ rospy.init_node("vcam",anonymous=True)
 thispath= subprocess.getoutput("rospack find vcam3d")
 ###Load params
 try:
-  Config.update(rospy.get_param("/config/vcam"))
+  Config.update(rospy.get_param("~config"))
 except Exception as e:
   print("get_param exception:",e.args)
 try:
-  Param.update(rospy.get_param(""))
+  Param.update(rospy.get_param("~param"))
 except Exception as e:
   print("get_param exception:",e.args)
 
@@ -139,10 +139,10 @@ for m in rospy.get_param(Config["scenes"]):
   loadMesh(m[0],m[1])
 
 ###Topics
-rospy.Subscriber("X1",Bool,cb_capture)
-pub_pc2=rospy.Publisher("pc2",PointCloud2,queue_size=1)
-pub_floats=rospy.Publisher("floats",numpy_msg(Floats),queue_size=1)
-pub_done=rospy.Publisher("Y1",Bool,queue_size=1)
+rospy.Subscriber("~X1",Bool,cb_capture)
+pub_pc2=rospy.Publisher("~pc2",PointCloud2,queue_size=1)
+pub_floats=rospy.Publisher("~floats",numpy_msg(Floats),queue_size=1)
+pub_done=rospy.Publisher("~Y1",Bool,queue_size=1)
 ###Globals
 mTrue=Bool();mTrue.data=True
 mFalse=Bool()

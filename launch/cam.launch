@@ -2,7 +2,13 @@
   <!--Virtual Point cloud camera -->
   <rosparam command="load" file="$(find vcam3d)/config/camera.yaml" />
   <rosparam ns="camera" command="load" file="$(find vcam3d)/param/camera.yaml" />
-  <node ns="camera" pkg="vcam3d" type="vcam.py" name="" output="screen" />
+  <node pkg="vcam3d" type="vcam.py" name="" output="screen">
+    <remap from="~config" to="/config/vcam" />
+    <remap from="~param" to="/camera" />
+    <remap from="~X1" to="/camera/X1" />
+    <remap from="~Y1" to="/camera/Y1" />
+    <remap from="~pc2" to="/camera/pc2" />
+  </node>
 
   <!--Virtual 2D camera (only camera parameter)-->
   <node ns="camera" pkg="rostopic" name="camera_info" type="rostopic"
@@ -10,9 +16,11 @@
      '{header: {seq: 0, stamp: {secs: 0, nsecs: 0}, frame_id: 'camera'},
       height: 480, width: 640, distortion_model: 'plumb_bob',
       D: [0],
-      K: [2070.3208281890875, 0.0, 451.6704559326172, 0.0, 2070.3208281890875, 477.6067123413086,
-      0.0, 0.0, 1.0],
+      K: [2070, 0.0, 451,
+          0.0, 2070, 477,
+          0.0, 0.0, 1.0],
       R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
-      P: [1035.8376579761182, 0.0, 226.62960815429688, 0.0, 0.0, 1035.8376579761182,
-      224.84519386291504, 0.0, 0.0, 0.0, 1.0, 0.0]}' -r 1" />
+      P: [1035, 0.0, 226, 0.0,
+          0.0, 1035, 224, 0.0,
+          0.0, 0.0, 1.0, 0.0]}' -r 1" />
 </launch>
