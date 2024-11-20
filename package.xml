@@ -11,4 +11,5 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <depend>smabo</depend>
+  <depend>ros_numpy</depend>
 </package>

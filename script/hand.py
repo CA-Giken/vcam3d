@@ -82,14 +82,48 @@ if __name__=="__main__":
   transx_control.always_visible = True
   transx_control.name = "move_x"
   transx_control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
+  transx_control.orientation.w = 1
+  transx_control.orientation.x = 1
   int_marker.controls.append(transx_control);
+
+  transy_control = InteractiveMarkerControl()
+  transy_control.always_visible = True
+  transy_control.name = "move_y"
+  transy_control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
+  transy_control.orientation.w = 1
+  transy_control.orientation.z = 1
+  int_marker.controls.append(transy_control);
+
+  transz_control = InteractiveMarkerControl()
+  transz_control.always_visible = True
+  transz_control.name = "move_z"
+  transz_control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
+  transz_control.orientation.w = 1
+  transz_control.orientation.y = 1
+  int_marker.controls.append(transz_control);
+
+  rotx_control = InteractiveMarkerControl()
+  rotx_control.always_visible = True
+  rotx_control.name = "rot_x"
+  rotx_control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
+  rotx_control.orientation.w = 1
+  rotx_control.orientation.x = 1
+  int_marker.controls.append(rotx_control);
+
+  roty_control = InteractiveMarkerControl()
+  roty_control.always_visible = True
+  roty_control.name = "rot_y"
+  roty_control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
+  roty_control.orientation.w = 1
+  roty_control.orientation.z = 1
+  int_marker.controls.append(roty_control);
 
   rotz_control = InteractiveMarkerControl()
   rotz_control.always_visible = True
   rotz_control.name = "rot_z"
   rotz_control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
   rotz_control.orientation.w = 1
-  rotz_control.orientation.x = 1
+  rotz_control.orientation.y = 1
   int_marker.controls.append(rotz_control);
 
   server.insert(int_marker, processFeedback)
