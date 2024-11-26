@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
 import rospy
+import tf2_ros
+import numpy as np
+from std_msgs.msg import Header
 from geometry_msgs.msg import TransformStamped
+from geometry_msgs.msg import Pose
 from interactive_markers.interactive_marker_server import *
 from visualization_msgs.msg import *
 from scipy.spatial.transform import Rotation as R
@@ -13,37 +17,74 @@ Config={
   "initial_pose":[0,0,1000,180,0,0]
 }
 
-def initPose(ev):
-  tf=TransformStamped()
-  tf.header.stamp=rospy.Time.now()
-  tf.header.frame_id=Config["base_frame_id"]
-  tf.child_frame_id=Config["frame_id"]
-  tf.transform.translation.x=Config["initial_pose"][0]
-  tf.transform.translation.y=Config["initial_pose"][1]
-  tf.transform.translation.z=Config["initial_pose"][2]
+tfThis=TransformStamped()
+
+def startMarker(ev):
+  global tfThis;
+  try:
+    ts=tfBuffer.lookup_transform(Config["base_frame_id"],Config["frame_id"],rospy.Time())
+  except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+    pass
+  else:
+    tfThis=ts
+    int_marker.pose.position=ts.transform.translation
+    int_marker.pose.orientation=ts.transform.rotation
+    server.insert(int_marker, processFeedback)
+    server.applyChanges()
+  rospy.Timer(rospy.Duration(1),followMarker,oneshot=True)
+
+def initMarker(ev):
+  global tfThis;
+  tfThis.header.stamp=rospy.Time.now()
+  tfThis.transform.translation.x=Config["initial_pose"][0]
+  tfThis.transform.translation.y=Config["initial_pose"][1]
+  tfThis.transform.translation.z=Config["initial_pose"][2]
   euler=Config["initial_pose"][3:6]
   quat=R.from_euler('XYZ',euler,degrees=True).as_quat()
-  tf.transform.rotation.x=quat[0]
-  tf.transform.rotation.y=quat[1]
-  tf.transform.rotation.z=quat[2]
-  tf.transform.rotation.w=quat[3]
-  if ev is not None: pub_tf.publish(tf)
-  return tf.transform
+  tfThis.transform.rotation.x=quat[0]
+  tfThis.transform.rotation.y=quat[1]
+  tfThis.transform.rotation.z=quat[2]
+  tfThis.transform.rotation.w=quat[3]
+  if ev is not None: pub_tf.publish(tfThis)
+  return tfThis.transform
+
+def followMarker(ev):
+  global tfThis;
+  try:
+    ts=tfBuffer.lookup_transform(Config["base_frame_id"],Config["frame_id"],rospy.Time())
+  except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+    pass
+  else:
+    err=np.array([
+      tfThis.transform.translation.x-ts.transform.translation.x,
+      tfThis.transform.translation.y-ts.transform.translation.y,
+      tfThis.transform.translation.z-ts.transform.translation.z])
+    if np.linalg.norm(err)>1:
+      tfThis=ts
+      header=Header()
+      header.stamp=rospy.Time.now()
+      pose=Pose()
+      pose.position=ts.transform.translation
+      pose.orientation=ts.transform.rotation
+      server.setPose(int_marker.name,pose,header)
+      server.applyChanges()
+  rospy.Timer(rospy.Duration(1),followMarker,oneshot=True)
 
 def processFeedback(feedback):
+  global tfThis;
   p = feedback.pose.position
   o = feedback.pose.orientation
-  tf=TransformStamped()
-  tf.header.stamp=rospy.Time.now()
-  tf.header.frame_id=Config["base_frame_id"]
-  tf.child_frame_id=Config["frame_id"]
-  tf.transform.translation=p
-  tf.transform.rotation=o
-  pub_tf.publish(tf)
-  print(feedback.marker_name + " is now at " + str(p.x) + ", " + str(p.y) + ", " + str(p.z))
+  tfThis.header.stamp=rospy.Time.now()
+  tfThis.transform.translation=p
+  tfThis.transform.rotation=o
+  tfThis.header.seq=tfThis.header.seq+1
+  pub_tf.publish(tfThis)
 
 if __name__=="__main__":
   rospy.init_node("hand_marker")
+
+  tfThis.header.frame_id=Config["base_frame_id"]
+  tfThis.child_frame_id=Config["frame_id"]
     
   pub_tf=rospy.Publisher('/update/config_tf',TransformStamped,queue_size=1);
 
@@ -55,10 +96,6 @@ if __name__=="__main__":
   int_marker.name = "hand_marker"
   int_marker.description = "Hand"
   int_marker.scale=300
-  print(dir(int_marker))
-  tr=initPose(None)
-  int_marker.pose.position=tr.translation
-  int_marker.pose.orientation=tr.rotation
 
   # create a grey box marker
 #  stl_marker = Marker()
@@ -126,9 +163,8 @@ if __name__=="__main__":
   rotz_control.orientation.y = 1
   int_marker.controls.append(rotz_control);
 
-  server.insert(int_marker, processFeedback)
-  server.applyChanges()
-
-  rospy.Timer(rospy.Duration(3),initPose,oneshot=True)
+  tfBuffer=tf2_ros.Buffer()
+  listener=tf2_ros.TransformListener(tfBuffer)
+  rospy.Timer(rospy.Duration(3),startMarker,oneshot=True)
 
   rospy.spin()
