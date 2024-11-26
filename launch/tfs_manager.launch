@@ -1,0 +1,4 @@
+<launch>
+    <node name="load_params" pkg="vcam3d" type="load_tfs.sh" output="screen" />
+    <node name="tfs_manager" pkg="vcam3d" type="tfs_manager.py" output="screen" />
+</launch>

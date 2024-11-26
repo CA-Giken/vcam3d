@@ -1,0 +1,43 @@
+tf_list:
+- isLabel: false
+  key: f19ed72411fe48a291103051e57f01f4
+  label: test
+  parentKey: ''
+  tf:
+    rotation:
+      w: 6.123234262925839e-17
+      x: 1.0
+      y: 0.0
+      z: 0.0
+    translation:
+      x: 12.0
+      y: -249.08993530273438
+      z: 500.0
+- isLabel: false
+  key: a7a9a930bbca4d8ba42cf5c5473c22fa
+  label: test2
+  parentKey: ''
+  tf:
+    rotation:
+      w: 6.123234262925839e-17
+      x: 1.0
+      y: 0.0
+      z: 0.0
+    translation:
+      x: 3.0517578125e-05
+      y: 0.0
+      z: 1494.6483154296875
+- isLabel: false
+  key: 877a0634b4b34acab44d290365731f01
+  label: test3
+  parentKey: ''
+  tf:
+    rotation:
+      w: 6.123234262925839e-17
+      x: 1.0
+      y: 0.0
+      z: 0.0
+    translation:
+      x: 3.0517578125e-05
+      y: 150.0
+      z: 1494.6483154296875
