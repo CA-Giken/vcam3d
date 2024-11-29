@@ -82,6 +82,11 @@ def processFeedback(feedback):
 
 if __name__=="__main__":
   rospy.init_node("hand_marker")
+  ###Load Config
+  try:
+    Config.update(rospy.get_param("~config"))
+  except Exception as e:
+    print("get_param exception:",e.args)
 
   tfThis.header.frame_id=Config["base_frame_id"]
   tfThis.child_frame_id=Config["frame_id"]

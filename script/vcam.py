@@ -13,6 +13,7 @@ import copy
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Transform
 from sensor_msgs.msg import PointCloud2
+from sensor_msgs.msg import CameraInfo
 from smabo import open3d_conversions
 from smabo import tflib
 from smabo.msg import Floats
@@ -21,10 +22,12 @@ from rospy.numpy_msg import numpy_msg
 Config={
   "scenes":"/config/scene/meshes",
   "frame_id":"camera",
-  "wx":600,
-  "wy":500,
-  "wd":600,
-  "views":[[0,0,0]],
+  "width":1000,  #px
+  "height":1000,  #px
+  "wx":600, #mm
+  "wy":600, #mm
+  "wd":600, #mm
+  "baseline":80, #mm
   "view_r":50000,
 }
 Param={
@@ -96,6 +99,38 @@ def cb_scan(ev):
     pcd=resamp(VoxelPoints,Frames)
     pc2=open3d_conversions.to_msg(pcd,frame_id=Config["frame_id"])
     pub_pc2.publish(pc2)
+
+  dotx=Config["width"]
+  doty=Config["height"]
+  fx=dotx*Config["wd"]/Config["wx"]
+  fy=doty*Config["wd"]/Config["wy"]
+  c1x=dotx/2
+  c1y=doty/2
+  c2x=dotx/2
+  c2y=c1y
+
+  cam1=CameraInfo()
+  cam1.header.stamp=rospy.Time.now()
+  cam1.header.frame_id=Config["frame_id"]
+  cam1.width=dotx
+  cam1.height=doty
+  cam1.K=np.array([fx,0,c1x, 0,fy,c1y, 0,0,1])
+  RT1=np.array([1,0,0,0, 0,1,0,0, 0,0,1,0])
+  cam1.R=RT1.reshape((3,4))[:3,:3].ravel()
+  cam1.P=cam1.K.reshape((3,3)).dot(RT1.reshape((3,4))).ravel()
+  pub_info.publish(cam1)
+
+  cam2=CameraInfo()
+  cam2.header.stamp=rospy.Time.now()
+  cam2.header.frame_id=Config["frame_id"]
+  cam2.width=dotx
+  cam2.height=doty
+  cam2.K=np.array([fx,0,c2x, 0,fy,c2y, 0,0,1])
+  RT2=np.array([1,0,0,-Config["baseline"], 0,1,0,0, 0,0,1,0])
+  cam2.R=RT2.reshape((3,4))[:3,:3].ravel()
+  cam2.P=cam2.K.reshape((3,3)).dot(RT2.reshape((3,4))).ravel()
+  pub_info2.publish(cam2)
+
   rospy.Timer(rospy.Duration(0.5),cb_scan,oneshot=True)
 
 def loadMesh(mesh,frame='world'):
@@ -143,6 +178,9 @@ rospy.Subscriber("~X1",Bool,cb_capture)
 pub_pc2=rospy.Publisher("~pc2",PointCloud2,queue_size=1)
 pub_floats=rospy.Publisher("~floats",numpy_msg(Floats),queue_size=1)
 pub_done=rospy.Publisher("~Y1",Bool,queue_size=1)
+pub_info=rospy.Publisher("~info",CameraInfo,queue_size=1)    #the 1st-camera info
+pub_info2=rospy.Publisher("~info2",CameraInfo,queue_size=1)  #the 2nd-camera info
+
 ###Globals
 mTrue=Bool();mTrue.data=True
 mFalse=Bool()

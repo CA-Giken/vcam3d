@@ -1,9 +1,9 @@
 config:
   vcam:
     height: 1080
-    width: 1280
+    width: 1080
     wx: 600
-    wy: 500
+    wy: 600
     wd: 600
   S10:
     height: 480
